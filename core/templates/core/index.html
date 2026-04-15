@@ -1,0 +1,49 @@
+{% extends 'core/base.html' %}
+
+{% block title %}AgendaFácil — Agendamento Online{% endblock %}
+
+{% block content %}
+<nav class="navbar navbar-expand-lg" style="background-color: #6c63ff;">
+    <div class="container">
+        <a class="navbar-brand text-white fw-bold" href="{% url 'index' %}">AgendaFácil</a>
+        <div class="d-flex gap-2">
+            <a href="{% url 'login' %}" class="btn btn-outline-light btn-sm">Login</a>
+            <a href="{% url 'cadastro' %}" class="btn btn-light btn-sm text-primario fw-bold">Cadastre-se</a>
+        </div>
+    </div>
+</nav>
+
+<section class="text-center py-5" style="background: linear-gradient(135deg, #6c63ff, #a29bfe); min-height: 60vh; display: flex; align-items: center;">
+    <div class="container">
+        <h1 class="display-4 fw-bold text-white mb-3">AgendaFácil</h1>
+        <p class="lead text-white mb-4">Sistema de agendamento online gratuito para pequenos prestadores de serviços</p>
+        <div class="d-flex justify-content-center gap-3">
+            <a href="{% url 'cadastro' %}" class="btn btn-light btn-lg text-primario fw-bold">Começar Grátis</a>
+            <a href="{% url 'login' %}" class="btn btn-outline-light btn-lg">Saiba Mais</a>
+        </div>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <h2 class="text-center fw-bold mb-5">Por que escolher o AgendaFácil?</h2>
+        <div class="row g-4">
+            <div class="col-md-4 text-center">
+                <i class="bi bi-calendar-check fs-1 text-primario mb-3"></i>
+                <h5 class="fw-bold">Agendamento Simples</h5>
+                <p class="text-muted">Seus clientes agendam online em poucos cliques. Sem complicação, sem WhatsApp.</p>
+            </div>
+            <div class="col-md-4 text-center">
+                <i class="bi bi-bell fs-1 text-primario mb-3"></i>
+                <h5 class="fw-bold">Lembretes Automáticos</h5>
+                <p class="text-muted">Reduza faltas com lembretes automáticos. Seus clientes não esquecem mais!</p>
+            </div>
+            <div class="col-md-4 text-center">
+                <i class="bi bi-graph-up fs-1 text-primario mb-3"></i>
+                <h5 class="fw-bold">Gestão Profissional</h5>
+                <p class="text-muted">Organize sua agenda, gerencie serviços e acompanhe seu negócio.</p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

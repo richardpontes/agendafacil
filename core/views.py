@@ -1,0 +1,94 @@
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from django.contrib.auth.hashers import make_password, check_password
+from .models import Usuario, Prestador
+
+
+def index(request):
+    return render(request, 'core/index.html')
+
+
+def cadastro(request):
+    if request.method == 'POST':
+        nome = request.POST.get('nome')
+        email = request.POST.get('email')
+        senha = request.POST.get('senha')
+        confirmar_senha = request.POST.get('confirmar_senha')
+        telefone = request.POST.get('telefone')
+        tipo = request.POST.get('tipo')
+
+        if senha != confirmar_senha:
+            messages.error(request, 'As senhas não coincidem.')
+            return render(request, 'core/cadastro.html')
+
+        if Usuario.objects.filter(email=email).exists():
+            messages.error(request, 'Este e-mail já está cadastrado.')
+            return render(request, 'core/cadastro.html')
+
+        usuario = Usuario.objects.create(
+            nome=nome,
+            email=email,
+            senha=make_password(senha),
+            telefone=telefone,
+            tipo=tipo,
+        )
+
+        if tipo == 'prestador':
+            nome_negocio = request.POST.get('nome_negocio')
+            endereco = request.POST.get('endereco')
+            horario_inicio = request.POST.get('horario_inicio')
+            horario_fim = request.POST.get('horario_fim')
+            dias_funcionamento = request.POST.get('dias_funcionamento')
+
+            Prestador.objects.create(
+                usuario=usuario,
+                nome_negocio=nome_negocio,
+                endereco=endereco,
+                horario_inicio=horario_inicio,
+                horario_fim=horario_fim,
+                dias_funcionamento=dias_funcionamento,
+            )
+
+        messages.success(request, 'Cadastro realizado com sucesso! Faça login para continuar.')
+        return redirect('login')
+
+    return render(request, 'core/cadastro.html')
+
+
+def login_view(request):
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        senha = request.POST.get('senha')
+
+        try:
+            usuario = Usuario.objects.get(email=email)
+            if check_password(senha, usuario.senha):
+                request.session['usuario_id'] = usuario.id
+                request.session['usuario_nome'] = usuario.nome
+                request.session['usuario_tipo'] = usuario.tipo
+
+                if usuario.tipo == 'cliente':
+                    return redirect('dashboard_cliente')
+                else:
+                    return redirect('dashboard_cliente')
+            else:
+                messages.error(request, 'E-mail ou senha incorretos.')
+        except Usuario.DoesNotExist:
+            messages.error(request, 'E-mail ou senha incorretos.')
+
+    return render(request, 'core/login.html')
+
+
+def logout_view(request):
+    request.session.flush()
+    return redirect('login')
+
+
+def dashboard_cliente(request):
+    if not request.session.get('usuario_id'):
+        return redirect('login')
+
+    context = {
+        'nome': request.session.get('usuario_nome'),
+    }
+    return render(request, 'core/dashboard_cliente.html', context)

@@ -1,0 +1,88 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Dashboard — AgendaFácil{% endblock %}
+
+{% block content %}
+<div class="d-flex" style="min-height: 100vh;">
+    <!-- Sidebar -->
+    <div class="d-flex flex-column p-3" style="width: 220px; background-color: #6c63ff; min-height: 100vh;">
+        <h5 class="text-white fw-bold mb-4 mt-2">AgendaFácil</h5>
+        <nav class="nav flex-column gap-2">
+            <a href="{% url 'dashboard_cliente' %}" class="nav-link text-white">
+                <i class="bi bi-house me-2"></i>Início
+            </a>
+            <a href="#" class="nav-link text-white">
+                <i class="bi bi-calendar-plus me-2"></i>Agendar Serviço
+            </a>
+            <a href="#" class="nav-link text-white">
+                <i class="bi bi-calendar-check me-2"></i>Meus Agendamentos
+            </a>
+            <a href="#" class="nav-link text-white">
+                <i class="bi bi-person me-2"></i>Meu Perfil
+            </a>
+        </nav>
+        <div class="mt-auto">
+            <a href="{% url 'logout' %}" class="nav-link text-white">
+                <i class="bi bi-box-arrow-right me-2"></i>Sair
+            </a>
+        </div>
+    </div>
+
+    <!-- Conteúdo principal -->
+    <div class="flex-grow-1 p-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="fw-bold mb-0">Olá, {{ nome }}! 👋</h4>
+            <div class="rounded-circle text-white d-flex align-items-center justify-content-center fw-bold"
+                 style="width:40px; height:40px; background-color:#6c63ff;">
+                {{ nome|first|upper }}
+            </div>
+        </div>
+
+        <!-- Cards de resumo -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body text-center">
+                        <i class="bi bi-calendar fs-2 text-primario"></i>
+                        <h3 class="fw-bold mt-2">0</h3>
+                        <p class="text-muted mb-0">Agendamentos futuros</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body text-center">
+                        <i class="bi bi-check-circle fs-2 text-primario"></i>
+                        <h3 class="fw-bold mt-2">0</h3>
+                        <p class="text-muted mb-0">Agendamentos realizados</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body text-center">
+                        <i class="bi bi-clock fs-2 text-primario"></i>
+                        <h3 class="fw-bold mt-2">0</h3>
+                        <p class="text-muted mb-0">Aguardando confirmação</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Próximos agendamentos -->
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold mb-0">Próximos Agendamentos</h5>
+                    <a href="#" class="btn btn-primario btn-sm">+ Novo Agendamento</a>
+                </div>
+                <div class="text-center py-4 text-muted">
+                    <i class="bi bi-calendar-x fs-1 mb-2 d-block"></i>
+                    Você não tem agendamentos futuros.<br>
+                    <a href="#" class="text-primario text-decoration-none">Agendar agora</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

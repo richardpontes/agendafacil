@@ -1,0 +1,103 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Cadastro — AgendaFácil{% endblock %}
+
+{% block content %}
+<div class="min-vh-100 d-flex align-items-center justify-content-center py-5" style="background: linear-gradient(135deg, #6c63ff, #a29bfe);">
+    <div class="card shadow-lg" style="width: 100%; max-width: 480px; border-radius: 16px;">
+        <div class="card-body p-5">
+            <h2 class="text-center fw-bold text-primario mb-1">AgendaFácil</h2>
+            <p class="text-center text-muted mb-4">Crie sua conta gratuitamente</p>
+
+            <div class="d-flex gap-2 mb-4">
+                <button class="btn btn-primario w-50 py-2 fw-bold" id="btn-cliente" onclick="selecionarTipo('cliente')">
+                    Cliente<br><small class="fw-normal">Quero agendar serviços</small>
+                </button>
+                <button class="btn btn-outline-secondary w-50 py-2" id="btn-prestador" onclick="selecionarTipo('prestador')">
+                    Prestador<br><small>Quero oferecer serviços</small>
+                </button>
+            </div>
+
+            <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="tipo" id="tipo" value="cliente">
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Nome Completo</label>
+                    <input type="text" name="nome" class="form-control" placeholder="Seu nome completo" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">E-mail</label>
+                    <input type="email" name="email" class="form-control" placeholder="seu@email.com" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Telefone</label>
+                    <input type="text" name="telefone" class="form-control" placeholder="(00) 00000-0000">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Senha</label>
+                    <input type="password" name="senha" class="form-control" placeholder="Mínimo 6 caracteres" required>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label fw-semibold">Confirmar Senha</label>
+                    <input type="password" name="confirmar_senha" class="form-control" placeholder="Digite a senha novamente" required>
+                </div>
+
+                <div id="campos-prestador" style="display:none;">
+                    <hr>
+                    <p class="fw-semibold text-primario">Dados do Negócio</p>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Nome do Negócio</label>
+                        <input type="text" name="nome_negocio" class="form-control" placeholder="Ex: Salão Beleza & Charme">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Endereço</label>
+                        <input type="text" name="endereco" class="form-control" placeholder="Rua, número, bairro">
+                    </div>
+                    <div class="row">
+                        <div class="col-6 mb-3">
+                            <label class="form-label fw-semibold">Horário Início</label>
+                            <input type="time" name="horario_inicio" class="form-control">
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label class="form-label fw-semibold">Horário Fim</label>
+                            <input type="time" name="horario_fim" class="form-control">
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">Dias de Funcionamento</label>
+                        <input type="text" name="dias_funcionamento" class="form-control" placeholder="Ex: Segunda a Sábado">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primario w-100 py-2 fw-bold">Criar Conta</button>
+            </form>
+
+            <p class="text-center text-muted small mt-3 mb-0">
+                Já tem uma conta? <a href="{% url 'login' %}" class="text-primario text-decoration-none">Fazer login</a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function selecionarTipo(tipo) {
+    document.getElementById('tipo').value = tipo;
+    const btnCliente = document.getElementById('btn-cliente');
+    const btnPrestador = document.getElementById('btn-prestador');
+    const camposPrestador = document.getElementById('campos-prestador');
+
+    if (tipo === 'cliente') {
+        btnCliente.className = 'btn btn-primario w-50 py-2 fw-bold';
+        btnPrestador.className = 'btn btn-outline-secondary w-50 py-2';
+        camposPrestador.style.display = 'none';
+    } else {
+        btnCliente.className = 'btn btn-outline-secondary w-50 py-2';
+        btnPrestador.className = 'btn btn-primario w-50 py-2 fw-bold';
+        camposPrestador.style.display = 'block';
+    }
+}
+</script>
+{% endblock %}
