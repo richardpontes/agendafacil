@@ -70,7 +70,7 @@ def login_view(request):
                 if usuario.tipo == 'cliente':
                     return redirect('dashboard_cliente')
                 else:
-                    return redirect('dashboard_cliente')
+                    return redirect('dashboard_prestador')
             else:
                 messages.error(request, 'E-mail ou senha incorretos.')
         except Usuario.DoesNotExist:
@@ -92,3 +92,22 @@ def dashboard_cliente(request):
         'nome': request.session.get('usuario_nome'),
     }
     return render(request, 'core/dashboard_cliente.html', context)
+
+def dashboard_prestador(request):
+    if not request.session.get('usuario_id'):
+        return redirect('login')
+
+    if request.session.get('usuario_tipo') != 'prestador':
+        return redirect('dashboard_cliente')
+
+    try:
+        usuario = Usuario.objects.get(id=request.session.get('usuario_id'))
+        prestador = Prestador.objects.get(usuario=usuario)
+    except (Usuario.DoesNotExist, Prestador.DoesNotExist):
+        return redirect('login')
+
+    context = {
+        'nome': request.session.get('usuario_nome'),
+        'prestador': prestador,
+    }
+    return render(request, 'core/dashboard_prestador.html', context)
