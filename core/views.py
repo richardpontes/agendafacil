@@ -35,7 +35,13 @@ def cadastro(request):
 
         if tipo == 'prestador':
             nome_negocio = request.POST.get('nome_negocio')
-            endereco = request.POST.get('endereco')
+            cep = request.POST.get('cep')
+            logradouro = request.POST.get('logradouro')
+            numero = request.POST.get('numero')
+            complemento = request.POST.get('complemento')
+            bairro = request.POST.get('bairro')
+            cidade = request.POST.get('cidade')
+            estado = request.POST.get('estado')
             horario_inicio = request.POST.get('horario_inicio')
             horario_fim = request.POST.get('horario_fim')
             dias_funcionamento = request.POST.get('dias_funcionamento')
@@ -43,7 +49,13 @@ def cadastro(request):
             Prestador.objects.create(
                 usuario=usuario,
                 nome_negocio=nome_negocio,
-                endereco=endereco,
+                cep=cep,
+                logradouro=logradouro,
+                numero=numero,
+                complemento=complemento,
+                bairro=bairro,
+                cidade=cidade,
+                estado=estado,
                 horario_inicio=horario_inicio,
                 horario_fim=horario_fim,
                 dias_funcionamento=dias_funcionamento,

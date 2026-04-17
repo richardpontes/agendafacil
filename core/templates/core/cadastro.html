@@ -51,8 +51,42 @@
                         <input type="text" name="nome_negocio" class="form-control" placeholder="Ex: Salão Beleza & Charme">
                     </div>
                     <div class="mb-3">
-                        <label class="form-label fw-semibold">Endereço</label>
-                        <input type="text" name="endereco" class="form-control" placeholder="Rua, número, bairro">
+                        <label class="form-label fw-semibold">CEP</label>
+                        <div class="input-group">
+                            <input type="text" name="cep" id="cep" class="form-control" placeholder="00000-000" maxlength="9">
+                            <button type="button" class="btn btn-outline-secondary" onclick="buscarCEP()">
+                                <i class="bi bi-search"></i>
+                            </button>
+                        </div>
+                        <small id="cep-status" class="text-muted"></small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Logradouro</label>
+                        <input type="text" name="logradouro" id="logradouro" class="form-control" placeholder="Rua, Avenida, etc.">
+                    </div>
+                    <div class="row">
+                        <div class="col-4 mb-3">
+                            <label class="form-label fw-semibold">Número</label>
+                            <input type="text" name="numero" id="numero" class="form-control" placeholder="Nº">
+                        </div>
+                        <div class="col-8 mb-3">
+                            <label class="form-label fw-semibold">Complemento</label>
+                            <input type="text" name="complemento" id="complemento" class="form-control" placeholder="Apto, Sala, etc.">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Bairro</label>
+                        <input type="text" name="bairro" id="bairro" class="form-control" placeholder="Bairro">
+                    </div>
+                    <div class="row">
+                        <div class="col-8 mb-3">
+                            <label class="form-label fw-semibold">Cidade</label>
+                            <input type="text" name="cidade" id="cidade" class="form-control" placeholder="Cidade">
+                        </div>
+                        <div class="col-4 mb-3">
+                            <label class="form-label fw-semibold">Estado</label>
+                            <input type="text" name="estado" id="estado" class="form-control" placeholder="RS" maxlength="2">
+                        </div>
                     </div>
                     <div class="row">
                         <div class="col-6 mb-3">
@@ -97,6 +131,44 @@ function selecionarTipo(tipo) {
         btnCliente.className = 'btn btn-outline-secondary w-50 py-2';
         btnPrestador.className = 'btn btn-primario w-50 py-2 fw-bold';
         camposPrestador.style.display = 'block';
+    }
+}
+async function buscarCEP() {
+    const cep = document.getElementById('cep').value.replace(/\D/g, '');
+    const status = document.getElementById('cep-status');
+
+    if (cep.length !== 8) {
+        status.textContent = 'CEP inválido. Digite 8 números.';
+        status.className = 'text-danger';
+        return;
+    }
+
+    status.textContent = 'Buscando...';
+    status.className = 'text-muted';
+
+    try {
+        const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+        const data = await response.json();
+
+        if (data.erro) {
+            status.textContent = 'CEP não encontrado.';
+            status.className = 'text-danger';
+            return;
+        }
+
+        document.getElementById('logradouro').value = data.logradouro || '';
+        document.getElementById('bairro').value = data.bairro || '';
+        document.getElementById('cidade').value = data.localidade || '';
+        document.getElementById('estado').value = data.uf || '';
+
+        status.textContent = 'CEP encontrado! Complete o número e o complemento.';
+        status.className = 'text-success';
+
+        document.getElementById('numero').focus();
+
+    } catch (error) {
+        status.textContent = 'Erro ao buscar CEP. Tente novamente.';
+        status.className = 'text-danger';
     }
 }
 </script>
