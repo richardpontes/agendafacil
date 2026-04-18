@@ -1,0 +1,89 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Meus Serviços — AgendaFácil{% endblock %}
+
+{% block content %}
+<div class="d-flex" style="min-height: 100vh;">
+    <!-- Sidebar -->
+    <div class="d-flex flex-column p-3" style="width: 220px; background-color: #6c63ff; min-height: 100vh;">
+        <h5 class="text-white fw-bold mb-4 mt-2">AgendaFácil</h5>
+        <nav class="nav flex-column gap-2">
+            <a href="{% url 'dashboard_prestador' %}" class="nav-link text-white">
+                <i class="bi bi-house me-2"></i>Início
+            </a>
+            <a href="#" class="nav-link text-white">
+                <i class="bi bi-calendar2-week me-2"></i>Minha Agenda
+            </a>
+            <a href="{% url 'listar_servicos' %}" class="nav-link text-white fw-bold">
+                <i class="bi bi-scissors me-2"></i>Meus Serviços
+            </a>
+            <a href="#" class="nav-link text-white">
+                <i class="bi bi-slash-circle me-2"></i>Bloqueios
+            </a>
+            <a href="#" class="nav-link text-white">
+                <i class="bi bi-person me-2"></i>Meu Perfil
+            </a>
+        </nav>
+        <div class="mt-auto">
+            <a href="{% url 'logout' %}" class="nav-link text-white">
+                <i class="bi bi-box-arrow-right me-2"></i>Sair
+            </a>
+        </div>
+    </div>
+
+    <!-- Conteúdo principal -->
+    <div class="flex-grow-1 p-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="fw-bold mb-0">Meus Serviços</h4>
+            <a href="{% url 'novo_servico' %}" class="btn btn-primario">
+                <i class="bi bi-plus-circle me-2"></i>Novo Serviço
+            </a>
+        </div>
+
+        {% if servicos %}
+        <div class="row g-3">
+            {% for servico in servicos %}
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h5 class="fw-bold mb-0">{{ servico.nome }}</h5>
+                            {% if servico.ativo %}
+                                <span class="badge bg-success">Ativo</span>
+                            {% else %}
+                                <span class="badge bg-secondary">Inativo</span>
+                            {% endif %}
+                        </div>
+                        <p class="text-muted small mb-2">{{ servico.descricao }}</p>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span class="text-muted small"><i class="bi bi-clock me-1"></i>{{ servico.duracao }} min</span>
+                            <span class="fw-bold text-primario">R$ {{ servico.preco }}</span>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <a href="{% url 'editar_servico' servico.id %}" class="btn btn-outline-secondary btn-sm w-50">
+                                <i class="bi bi-pencil me-1"></i>Editar
+                            </a>
+                            <a href="{% url 'excluir_servico' servico.id %}" class="btn btn-outline-danger btn-sm w-50"
+                               onclick="return confirm('Confirma a exclusão deste serviço?')">
+                                <i class="bi bi-trash me-1"></i>Excluir
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="card border-0 shadow-sm">
+            <div class="card-body text-center py-5">
+                <i class="bi bi-scissors fs-1 text-muted mb-3 d-block"></i>
+                <p class="text-muted">Você ainda não cadastrou nenhum serviço.</p>
+                <a href="{% url 'novo_servico' %}" class="btn btn-primario">
+                    <i class="bi bi-plus-circle me-2"></i>Cadastrar Primeiro Serviço
+                </a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

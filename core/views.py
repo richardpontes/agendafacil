@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth.hashers import make_password, check_password
-from .models import Usuario, Prestador
+from .models import Usuario, Prestador, Servico
 
 
 def index(request):
@@ -123,3 +123,84 @@ def dashboard_prestador(request):
         'prestador': prestador,
     }
     return render(request, 'core/dashboard_prestador.html', context)
+
+def listar_servicos(request):
+    if not request.session.get('usuario_id'):
+        return redirect('login')
+    if request.session.get('usuario_tipo') != 'prestador':
+        return redirect('dashboard_cliente')
+
+    usuario = Usuario.objects.get(id=request.session.get('usuario_id'))
+    prestador = Prestador.objects.get(usuario=usuario)
+    servicos = Servico.objects.filter(prestador=prestador)
+
+    context = {
+        'servicos': servicos,
+        'nome': request.session.get('usuario_nome'),
+    }
+    return render(request, 'core/servicos.html', context)
+
+
+def novo_servico(request):
+    if not request.session.get('usuario_id'):
+        return redirect('login')
+    if request.session.get('usuario_tipo') != 'prestador':
+        return redirect('dashboard_cliente')
+
+    if request.method == 'POST':
+        usuario = Usuario.objects.get(id=request.session.get('usuario_id'))
+        prestador = Prestador.objects.get(usuario=usuario)
+
+        nome = request.POST.get('nome')
+        descricao = request.POST.get('descricao')
+        duracao = request.POST.get('duracao')
+        preco = request.POST.get('preco')
+
+        Servico.objects.create(
+            prestador=prestador,
+            nome=nome,
+            descricao=descricao,
+            duracao=duracao,
+            preco=preco,
+        )
+        messages.success(request, 'Serviço cadastrado com sucesso!')
+        return redirect('listar_servicos')
+
+    return render(request, 'core/novo_servico.html', {'nome': request.session.get('usuario_nome')})
+
+
+def editar_servico(request, id):
+    if not request.session.get('usuario_id'):
+        return redirect('login')
+    if request.session.get('usuario_tipo') != 'prestador':
+        return redirect('dashboard_cliente')
+
+    servico = Servico.objects.get(id=id)
+
+    if request.method == 'POST':
+        servico.nome = request.POST.get('nome')
+        servico.descricao = request.POST.get('descricao')
+        servico.duracao = request.POST.get('duracao')
+        servico.preco = request.POST.get('preco')
+        servico.ativo = request.POST.get('ativo') == 'on'
+        servico.save()
+        messages.success(request, 'Serviço atualizado com sucesso!')
+        return redirect('listar_servicos')
+
+    context = {
+        'servico': servico,
+        'nome': request.session.get('usuario_nome'),
+    }
+    return render(request, 'core/editar_servico.html', context)
+
+
+def excluir_servico(request, id):
+    if not request.session.get('usuario_id'):
+        return redirect('login')
+    if request.session.get('usuario_tipo') != 'prestador':
+        return redirect('dashboard_cliente')
+
+    servico = Servico.objects.get(id=id)
+    servico.delete()
+    messages.success(request, 'Serviço excluído com sucesso!')
+    return redirect('listar_servicos')
