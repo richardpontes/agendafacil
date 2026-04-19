@@ -190,8 +190,7 @@ def editar_servico(request, id):
         servico.nome = request.POST.get('nome')
         servico.descricao = request.POST.get('descricao')
         servico.duracao = request.POST.get('duracao')
-        preco = request.POST.get('preco').replace(',', '.')  # linha nova
-        servico.preco = request.POST.get('preco')
+        servico.preco = request.POST.get('preco').replace(',', '.')
         servico.ativo = request.POST.get('ativo') == 'on'
         servico.save()
         messages.success(request, 'Serviço atualizado com sucesso!')
@@ -200,7 +199,6 @@ def editar_servico(request, id):
     context = {
         'servico': servico,
         'nome': request.session.get('usuario_nome'),
-        'preco_formatado': str(servico.preco).replace('.', ','),  # linha nova
     }
     return render(request, 'core/editar_servico.html', context)
 
