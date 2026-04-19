@@ -13,14 +13,14 @@
                 {% csrf_token %}
                 <div class="mb-3">
                     <label class="form-label fw-semibold">E-mail</label>
-                    <input type="email" name="email" class="form-control" placeholder="seu@email.com" required>
+                    <input type="email" name="email" class="form-control" placeholder="seu@email.com" value="{{ email_salvo }}" required>
                 </div>
                 <div class="mb-3">
                     <label class="form-label fw-semibold">Senha</label>
                     <input type="password" name="senha" class="form-control" placeholder="Digite sua senha" required>
                 </div>
                 <div class="mb-4 form-check">
-                    <input type="checkbox" class="form-check-input" id="lembrar">
+                    <input type="checkbox" class="form-check-input" id="lembrar" name="lembrar" {% if email_salvo %}checked{% endif %}>
                     <label class="form-check-label" for="lembrar">Lembrar de mim</label>
                 </div>
                 <button type="submit" class="btn btn-primario w-100 py-2 fw-bold">Entrar</button>

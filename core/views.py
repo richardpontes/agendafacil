@@ -68,9 +68,12 @@ def cadastro(request):
 
 
 def login_view(request):
+    email_salvo = request.COOKIES.get('email_lembrado', '')
+    
     if request.method == 'POST':
         email = request.POST.get('email')
         senha = request.POST.get('senha')
+        lembrar = request.POST.get('lembrar')
 
         try:
             usuario = Usuario.objects.get(email=email)
@@ -80,15 +83,21 @@ def login_view(request):
                 request.session['usuario_tipo'] = usuario.tipo
 
                 if usuario.tipo == 'cliente':
-                    return redirect('dashboard_cliente')
+                    response = redirect('dashboard_cliente')
                 else:
-                    return redirect('dashboard_prestador')
+                    response = redirect('dashboard_prestador')
+                
+                if lembrar:
+                    response.set_cookie('email_lembrado', email, max_age=30*24*60*60)
+                else:
+                    response.delete_cookie('email_lembrado')
+                return response
             else:
                 messages.error(request, 'E-mail ou senha incorretos.')
         except Usuario.DoesNotExist:
             messages.error(request, 'E-mail ou senha incorretos.')
 
-    return render(request, 'core/login.html')
+    return render(request, 'core/login.html', {'email_salvo': email_salvo})
 
 
 def logout_view(request):
