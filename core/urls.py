@@ -1,5 +1,5 @@
 from django.urls import path
-from . import views
+from . import views, api
 
 urlpatterns = [
     path('', views.index, name='index'),
@@ -19,4 +19,7 @@ urlpatterns = [
     path('agendar/<int:prestador_id>/<int:servico_id>/<str:data_str>/<str:horario_str>/', views.confirmar_agendamento, name='confirmar_agendamento'),
     path('meus-agendamentos/', views.meus_agendamentos, name='meus_agendamentos'),
     path('meus-agendamentos/cancelar/<int:agendamento_id>/', views.cancelar_agendamento, name='cancelar_agendamento'),
+    path('api/prestadores/', api.api_prestadores, name='api_prestadores'),
+    path('api/servicos/<int:prestador_id>/', api.api_servicos, name='api_servicos'),
+    path('api/horarios/<int:prestador_id>/<int:servico_id>/<str:data_str>/', api.api_horarios, name='api_horarios'),
 ]
