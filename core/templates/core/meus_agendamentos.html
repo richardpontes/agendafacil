@@ -5,7 +5,7 @@
 {% block content %}
 <div class="d-flex" style="min-height: 100vh;">
     <!-- Sidebar -->
-    <div class="d-flex flex-column p-3" style="width: 240px; flex-shrink: 0; background-color: #6c63ff; min-height: 100vh;">
+    <div class="d-flex flex-column p-3" style="width: 250px; flex-shrink: 0; background-color: #6c63ff; min-height: 100vh;">
         <h5 class="text-white fw-bold mb-4 mt-2">AgendaFácil</h5>
         <nav class="nav flex-column gap-2">
             <a href="{% url 'dashboard_cliente' %}" class="nav-link text-white">
@@ -46,9 +46,19 @@
                         </div>
                         <div class="text-end">
                             {% if ag.status == 'pendente' %}
-                                <span class="badge bg-warning text-dark">Pendente</span>
+                                <span class="badge bg-warning text-dark mb-2 d-block">Pendente</span>
+                                <a href="{% url 'cancelar_agendamento' ag.id %}" 
+                                   class="btn btn-outline-danger btn-sm"
+                                   onclick="return confirm('Confirma o cancelamento deste agendamento?')">
+                                    Cancelar
+                                </a>
                             {% elif ag.status == 'confirmado' %}
-                                <span class="badge bg-success">Confirmado</span>
+                                <span class="badge bg-success mb-2 d-block">Confirmado</span>
+                                <a href="{% url 'cancelar_agendamento' ag.id %}" 
+                                   class="btn btn-outline-danger btn-sm"
+                                   onclick="return confirm('Confirma o cancelamento deste agendamento?')">
+                                    Cancelar
+                                </a>
                             {% elif ag.status == 'cancelado' %}
                                 <span class="badge bg-danger">Cancelado</span>
                             {% endif %}

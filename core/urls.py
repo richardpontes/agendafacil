@@ -18,4 +18,5 @@ urlpatterns = [
     path('agendar/<int:prestador_id>/<int:servico_id>/<str:data_str>/', views.selecionar_horario, name='selecionar_horario'),
     path('agendar/<int:prestador_id>/<int:servico_id>/<str:data_str>/<str:horario_str>/', views.confirmar_agendamento, name='confirmar_agendamento'),
     path('meus-agendamentos/', views.meus_agendamentos, name='meus_agendamentos'),
+    path('meus-agendamentos/cancelar/<int:agendamento_id>/', views.cancelar_agendamento, name='cancelar_agendamento'),
 ]

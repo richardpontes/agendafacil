@@ -359,3 +359,15 @@ def meus_agendamentos(request):
         'nome': request.session.get('usuario_nome'),
     }
     return render(request, 'core/meus_agendamentos.html', context)
+
+def cancelar_agendamento(request, agendamento_id):
+    if not request.session.get('usuario_id'):
+        return redirect('login')
+    if request.session.get('usuario_tipo') != 'cliente':
+        return redirect('dashboard_prestador')
+
+    agendamento = Agendamento.objects.get(id=agendamento_id)
+    agendamento.status = 'cancelado'
+    agendamento.save()
+    messages.success(request, 'Agendamento cancelado com sucesso!')
+    return redirect('meus_agendamentos')
