@@ -1,0 +1,87 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Confirmar Agendamento — AgendaFácil{% endblock %}
+
+{% block content %}
+<div class="d-flex" style="min-height: 100vh;">
+    <!-- Sidebar -->
+    <div class="d-flex flex-column p-3" style="width: 240px; flex-shrink: 0; background-color: #6c63ff; min-height: 100vh;">
+        <h5 class="text-white fw-bold mb-4 mt-2">AgendaFácil</h5>
+        <nav class="nav flex-column gap-2">
+            <a href="{% url 'dashboard_cliente' %}" class="nav-link text-white">
+                <i class="bi bi-house me-2"></i>Início
+            </a>
+            <a href="{% url 'listar_prestadores' %}" class="nav-link text-white fw-bold">
+                <i class="bi bi-calendar-plus me-2"></i>Agendar Serviço
+            </a>
+            <a href="{% url 'meus_agendamentos' %}" class="nav-link text-white">
+                <i class="bi bi-calendar-check me-2"></i>Meus Agendamentos
+            </a>
+            <a href="#" class="nav-link text-white">
+                <i class="bi bi-person me-2"></i>Meu Perfil
+            </a>
+        </nav>
+        <div class="mt-auto">
+            <a href="{% url 'logout' %}" class="nav-link text-white">
+                <i class="bi bi-box-arrow-right me-2"></i>Sair
+            </a>
+        </div>
+    </div>
+
+    <!-- Conteúdo principal -->
+    <div class="flex-grow-1 p-4">
+        <div class="d-flex align-items-center mb-4">
+            <a href="{% url 'selecionar_horario' prestador.id servico.id data|date:'Y-m-d' %}" class="btn btn-outline-secondary btn-sm me-3">
+                <i class="bi bi-arrow-left"></i>
+            </a>
+            <h4 class="fw-bold mb-0">Confirmar Agendamento</h4>
+        </div>
+
+        <div class="card border-0 shadow-sm" style="max-width: 500px;">
+            <div class="card-body p-4">
+                <h5 class="fw-bold mb-4">Resumo do Agendamento</h5>
+
+                <div class="d-flex justify-content-between py-2 border-bottom">
+                    <span class="text-muted">Estabelecimento</span>
+                    <span class="fw-semibold">{{ prestador.nome_negocio }}</span>
+                </div>
+                <div class="d-flex justify-content-between py-2 border-bottom">
+                    <span class="text-muted">Serviço</span>
+                    <span class="fw-semibold">{{ servico.nome }}</span>
+                </div>
+                <div class="d-flex justify-content-between py-2 border-bottom">
+                    <span class="text-muted">Duração</span>
+                    <span class="fw-semibold">{{ servico.duracao }} min</span>
+                </div>
+                <div class="d-flex justify-content-between py-2 border-bottom">
+                    <span class="text-muted">Data</span>
+                    <span class="fw-semibold">{{ data|date:"d/m/Y" }}</span>
+                </div>
+                <div class="d-flex justify-content-between py-2 border-bottom">
+                    <span class="text-muted">Horário</span>
+                    <span class="fw-semibold">{{ horario|time:"H:i" }}</span>
+                </div>
+                <div class="d-flex justify-content-between py-2 mb-4">
+                    <span class="text-muted">Valor</span>
+                    <span class="fw-bold text-primario fs-5">R$ {{ servico.preco }}</span>
+                </div>
+
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primario px-4 w-100">
+                            <i class="bi bi-check-circle me-2"></i>Confirmar Agendamento
+                        </button>
+                    </div>
+                </form>
+
+                <div class="text-center mt-3">
+                    <a href="{% url 'selecionar_horario' prestador.id servico.id data|date:'Y-m-d' %}" class="text-muted text-decoration-none small">
+                        Cancelar e voltar
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

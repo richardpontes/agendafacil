@@ -1,7 +1,8 @@
+from django.utils import timezone
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth.hashers import make_password, check_password
-from .models import Usuario, Prestador, Servico
+from .models import Usuario, Prestador, Servico, Agendamento
 
 
 def index(request):
@@ -229,3 +230,132 @@ def listar_prestadores(request):
         'nome': request.session.get('usuario_nome'),
     }
     return render(request, 'core/prestadores.html', context)
+
+def selecionar_servico(request, prestador_id):
+    if not request.session.get('usuario_id'):
+        return redirect('login')
+    if request.session.get('usuario_tipo') != 'cliente':
+        return redirect('dashboard_prestador')
+
+    prestador = Prestador.objects.get(id=prestador_id)
+    servicos = Servico.objects.filter(prestador=prestador, ativo=True)
+
+    context = {
+        'prestador': prestador,
+        'servicos': servicos,
+        'nome': request.session.get('usuario_nome'),
+    }
+    return render(request, 'core/selecionar_servico.html', context)
+
+from datetime import date, datetime, timedelta
+
+def selecionar_data(request, prestador_id, servico_id):
+    if not request.session.get('usuario_id'):
+        return redirect('login')
+    if request.session.get('usuario_tipo') != 'cliente':
+        return redirect('dashboard_prestador')
+
+    prestador = Prestador.objects.get(id=prestador_id)
+    servico = Servico.objects.get(id=servico_id)
+
+    # Gera os próximos 30 dias
+    hoje = date.today()
+    datas = [hoje + timedelta(days=i) for i in range(1, 31)]
+
+    context = {
+        'prestador': prestador,
+        'servico': servico,
+        'datas': datas,
+        'nome': request.session.get('usuario_nome'),
+    }
+    return render(request, 'core/selecionar_data.html', context)
+
+def selecionar_horario(request, prestador_id, servico_id, data_str):
+    if not request.session.get('usuario_id'):
+        return redirect('login')
+    if request.session.get('usuario_tipo') != 'cliente':
+        return redirect('dashboard_prestador')
+
+    prestador = Prestador.objects.get(id=prestador_id)
+    servico = Servico.objects.get(id=servico_id)
+    data = date.fromisoformat(data_str)
+
+    # Gera slots de horário baseado no horário do prestador
+    slots = []
+    import pytz
+    tz = pytz.timezone('America/Sao_Paulo')
+    hora_atual = tz.localize(datetime.combine(data, prestador.horario_inicio))
+    hora_fim = tz.localize(datetime.combine(data, prestador.horario_fim))
+    duracao = timedelta(minutes=servico.duracao)
+
+    while hora_atual + duracao <= hora_fim:
+        # Verifica se já existe agendamento nesse horário
+        ocupado = Agendamento.objects.filter(
+            prestador=prestador,
+            data_hora=hora_atual,
+            status__in=['pendente', 'confirmado']
+        ).exists()
+
+        if not ocupado:
+            slots.append(hora_atual.time())
+        hora_atual += duracao
+
+    context = {
+        'prestador': prestador,
+        'servico': servico,
+        'data': data,
+        'slots': slots,
+        'nome': request.session.get('usuario_nome'),
+    }
+    return render(request, 'core/selecionar_horario.html', context)
+
+def confirmar_agendamento(request, prestador_id, servico_id, data_str, horario_str):
+    if not request.session.get('usuario_id'):
+        return redirect('login')
+    if request.session.get('usuario_tipo') != 'cliente':
+        return redirect('dashboard_prestador')
+
+    prestador = Prestador.objects.get(id=prestador_id)
+    servico = Servico.objects.get(id=servico_id)
+    data = date.fromisoformat(data_str)
+    horario = datetime.strptime(horario_str, '%H:%M').time()
+    data_hora = datetime.combine(data, horario)
+
+    if request.method == 'POST':
+        usuario = Usuario.objects.get(id=request.session.get('usuario_id'))
+        Agendamento.objects.create(
+            cliente=usuario,
+            prestador=prestador,
+            servico=servico,
+            data_hora=data_hora,
+            status='pendente',
+        )
+        messages.success(request, 'Agendamento realizado com sucesso!')
+        return redirect('meus_agendamentos')
+
+    context = {
+        'prestador': prestador,
+        'servico': servico,
+        'data': data,
+        'horario': horario,
+        'data_hora': data_hora,
+        'nome': request.session.get('usuario_nome'),
+    }
+    return render(request, 'core/confirmar_agendamento.html', context)
+
+def meus_agendamentos(request):
+    if not request.session.get('usuario_id'):
+        return redirect('login')
+    if request.session.get('usuario_tipo') != 'cliente':
+        return redirect('dashboard_prestador')
+
+    usuario = Usuario.objects.get(id=request.session.get('usuario_id'))
+    agendamentos = Agendamento.objects.filter(
+        cliente=usuario
+    ).order_by('-data_hora')
+
+    context = {
+        'agendamentos': agendamentos,
+        'nome': request.session.get('usuario_nome'),
+    }
+    return render(request, 'core/meus_agendamentos.html', context)

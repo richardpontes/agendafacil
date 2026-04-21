@@ -1,6 +1,6 @@
 {% extends 'core/base.html' %}
 
-{% block title %}Agendar — AgendaFácil{% endblock %}
+{% block title %}Selecionar Serviço — AgendaFácil{% endblock %}
 
 {% block content %}
 <div class="d-flex" style="min-height: 100vh;">
@@ -12,10 +12,13 @@
                 <i class="bi bi-house me-2"></i>Início
             </a>
             <a href="{% url 'listar_prestadores' %}" class="nav-link text-white fw-bold">
-                <i class="bi bi-calendar-plus me-2"></i>Agendar
+                <i class="bi bi-calendar-plus me-2"></i>Agendar Serviço
             </a>
             <a href="#" class="nav-link text-white">
                 <i class="bi bi-calendar-check me-2"></i>Meus Agendamentos
+            </a>
+            <a href="#" class="nav-link text-white">
+                <i class="bi bi-person me-2"></i>Meu Perfil
             </a>
         </nav>
         <div class="mt-auto">
@@ -27,26 +30,31 @@
 
     <!-- Conteúdo principal -->
     <div class="flex-grow-1 p-4">
-        <h4 class="fw-bold mb-4">Escolha um Prestador</h4>
+        <div class="d-flex align-items-center mb-4">
+            <a href="{% url 'listar_prestadores' %}" class="btn btn-outline-secondary btn-sm me-3">
+                <i class="bi bi-arrow-left"></i>
+            </a>
+            <div>
+                <h4 class="fw-bold mb-0">{{ prestador.nome_negocio }}</h4>
+                <small class="text-muted"><i class="bi bi-clock me-1"></i>{{ prestador.horario_inicio }} — {{ prestador.horario_fim }}</small>
+            </div>
+        </div>
+
+        <h5 class="fw-bold mb-3">Escolha um Serviço</h5>
 
         <div class="row g-3">
-            {% for prestador in prestadores %}
+            {% for servico in servicos %}
             <div class="col-md-4">
                 <div class="card border-0 shadow-sm h-100">
                     <div class="card-body">
-                        <div class="rounded-circle text-white d-flex align-items-center justify-content-center fw-bold mb-3"
-                             style="width:48px; height:48px; background-color:#6c63ff; font-size:20px;">
-                            {{ prestador.nome_negocio|first|upper }}
+                        <h5 class="fw-bold mb-1">{{ servico.nome }}</h5>
+                        <p class="text-muted small mb-2">{{ servico.descricao }}</p>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span class="text-muted small"><i class="bi bi-clock me-1"></i>{{ servico.duracao }} min</span>
+                            <span class="fw-bold text-primario">R$ {{ servico.preco }}</span>
                         </div>
-                        <h5 class="fw-bold mb-1">{{ prestador.nome_negocio }}</h5>
-                        <p class="text-muted small mb-1">
-                            <i class="bi bi-geo-alt me-1"></i>{{ prestador.bairro }}, {{ prestador.cidade }}
-                        </p>
-                        <p class="text-muted small mb-3">
-                            <i class="bi bi-clock me-1"></i>{{ prestador.horario_inicio }} — {{ prestador.horario_fim }}
-                        </p>
-                        <a href="{% url 'selecionar_servico' prestador.id %}" class="btn btn-primario w-100">
-                            Agendar
+                        <a href="{% url 'selecionar_data' prestador.id servico.id %}" class="btn btn-primario w-100">
+                            Selecionar
                         </a>
                     </div>
                 </div>
@@ -55,8 +63,8 @@
             <div class="col-12">
                 <div class="card border-0 shadow-sm">
                     <div class="card-body text-center py-5">
-                        <i class="bi bi-calendar-x fs-1 text-muted mb-3 d-block"></i>
-                        <p class="text-muted">Nenhum prestador disponível no momento.</p>
+                        <i class="bi bi-scissors fs-1 text-muted mb-3 d-block"></i>
+                        <p class="text-muted">Nenhum serviço disponível.</p>
                     </div>
                 </div>
             </div>
