@@ -213,3 +213,19 @@ def excluir_servico(request, id):
     servico.delete()
     messages.success(request, 'Serviço excluído com sucesso!')
     return redirect('listar_servicos')
+
+def listar_prestadores(request):
+    if not request.session.get('usuario_id'):
+        return redirect('login')
+    if request.session.get('usuario_tipo') != 'cliente':
+        return redirect('dashboard_prestador')
+
+    prestadores = Prestador.objects.filter(
+        servico__ativo=True
+    ).distinct()
+
+    context = {
+        'prestadores': prestadores,
+        'nome': request.session.get('usuario_nome'),
+    }
+    return render(request, 'core/prestadores.html', context)

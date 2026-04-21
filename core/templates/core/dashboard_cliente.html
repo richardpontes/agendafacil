@@ -5,13 +5,13 @@
 {% block content %}
 <div class="d-flex" style="min-height: 100vh;">
     <!-- Sidebar -->
-    <div class="d-flex flex-column p-3" style="width: 220px; background-color: #6c63ff; min-height: 100vh;">
+    <div class="d-flex flex-column p-3" style="width: 240px; flex-shrink: 0; background-color: #6c63ff; min-height: 100vh;">
         <h5 class="text-white fw-bold mb-4 mt-2">AgendaFácil</h5>
         <nav class="nav flex-column gap-2">
             <a href="{% url 'dashboard_cliente' %}" class="nav-link text-white">
                 <i class="bi bi-house me-2"></i>Início
             </a>
-            <a href="#" class="nav-link text-white">
+            <a href="{% url 'listar_prestadores' %}" class="nav-link text-white">
                 <i class="bi bi-calendar-plus me-2"></i>Agendar Serviço
             </a>
             <a href="#" class="nav-link text-white">
@@ -74,12 +74,12 @@
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h5 class="fw-bold mb-0">Próximos Agendamentos</h5>
-                    <a href="#" class="btn btn-primario btn-sm">+ Novo Agendamento</a>
+                    <a href="{% url 'listar_prestadores' %}" class="btn btn-primario btn-sm">+ Novo Agendamento</a>
                 </div>
                 <div class="text-center py-4 text-muted">
                     <i class="bi bi-calendar-x fs-1 mb-2 d-block"></i>
                     Você não tem agendamentos futuros.<br>
-                    <a href="#" class="text-primario text-decoration-none">Agendar agora</a>
+                    <a href="{% url 'listar_prestadores' %}" class="text-primario text-decoration-none">Agendar agora</a>
                 </div>
             </div>
         </div>
