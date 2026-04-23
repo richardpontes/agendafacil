@@ -32,7 +32,18 @@ class Prestador(models.Model):
     estado = models.CharField(max_length=2, blank=True, null=True)
     horario_inicio = models.TimeField()
     horario_fim = models.TimeField()
-    dias_funcionamento = models.CharField(max_length=50, blank=True, null=True)
+    # dias_funcionamento = models.CharField(max_length=50, blank=True, null=True)
+    DIAS_CHOICES = [
+        ('Segunda', 'Segunda'),
+        ('Terça', 'Terça'),
+        ('Quarta', 'Quarta'),
+        ('Quinta', 'Quinta'),
+        ('Sexta', 'Sexta'),
+        ('Sábado', 'Sábado'),
+    (   'Domingo', 'Domingo'),
+    ]
+    dia_inicio = models.CharField(max_length=10, choices=DIAS_CHOICES, blank=True, null=True)
+    dia_fim = models.CharField(max_length=10, choices=DIAS_CHOICES, blank=True, null=True)
 
     def __str__(self):
         return self.nome_negocio

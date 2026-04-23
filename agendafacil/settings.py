@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_extensions', # para fazer o diagrama dos arquivos
     'rest_framework', # para fazer API
     'core',  # nosso app
 ]

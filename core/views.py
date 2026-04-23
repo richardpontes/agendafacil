@@ -45,7 +45,9 @@ def cadastro(request):
             estado = request.POST.get('estado')
             horario_inicio = request.POST.get('horario_inicio')
             horario_fim = request.POST.get('horario_fim')
-            dias_funcionamento = request.POST.get('dias_funcionamento')
+            # dias_funcionamento = request.POST.get('dias_funcionamento')
+            dia_inicio = request.POST.get('dia_inicio')
+            dia_fim = request.POST.get('dia_fim')
 
             Prestador.objects.create(
                 usuario=usuario,
@@ -59,7 +61,9 @@ def cadastro(request):
                 estado=estado,
                 horario_inicio=horario_inicio,
                 horario_fim=horario_fim,
-                dias_funcionamento=dias_funcionamento,
+                # dias_funcionamento=dias_funcionamento,
+                dia_inicio=dia_inicio,
+                dia_fim=dia_fim,
             )
 
         messages.success(request, 'Cadastro realizado com sucesso! Faça login para continuar.')

@@ -11,7 +11,7 @@ class ServicoSerializer(serializers.ModelSerializer):
 class PrestadorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Prestador
-        fields = ['id', 'nome_negocio', 'bairro', 'cidade', 'horario_inicio', 'horario_fim', 'dias_funcionamento']
+        fields = ['id', 'nome_negocio', 'bairro', 'cidade', 'horario_inicio', 'horario_fim', 'dia_inicio', 'dia_fim']
 
 
 class AgendamentoSerializer(serializers.ModelSerializer):
