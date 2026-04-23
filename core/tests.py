@@ -31,7 +31,9 @@ class AutenticacaoTest(TestCase):
             estado='RS',
             horario_inicio='09:00',
             horario_fim='18:00',
-            dias_funcionamento='Segunda a Sábado'
+            # dias_funcionamento='Segunda a Sábado'
+            dia_inicio='Segunda',
+            dia_fim='Sábado'
         )
 
     def test_pagina_inicial(self):
@@ -75,7 +77,9 @@ class AutenticacaoTest(TestCase):
             'estado': 'RS',
             'horario_inicio': '09:00',
             'horario_fim': '18:00',
-            'dias_funcionamento': 'Segunda a Sábado'
+            # 'dias_funcionamento': 'Segunda a Sábado'
+            'dia_inicio': 'Segunda',
+            'dia_fim': 'Sábado'
         })
         self.assertEqual(response.status_code, 302)
         self.assertTrue(Usuario.objects.filter(email='carlos@email.com').exists())
