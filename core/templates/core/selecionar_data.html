@@ -42,19 +42,19 @@
 
         <h5 class="fw-bold mb-3">Escolha uma Data</h5>
 
-        <div class="card border-0 shadow-sm" style="max-width: 400px;">
-            <div class="card-body p-3">
+        <div class="card border-0 shadow-sm" style="max-width: 560px;">
+            <div class="card-body p-4">
                 <!-- Navegação do mês -->
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <button class="btn btn-outline-secondary btn-sm" onclick="mudarMes(-1)">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <button class="btn btn-outline-secondary" onclick="mudarMes(-1)">
                         <i class="bi bi-chevron-left"></i>
                     </button>
-                    <span class="fw-bold" id="mes-ano"></span>
-                    <button class="btn btn-outline-secondary btn-sm" onclick="mudarMes(1)">
+                    <span class="fw-bold fs-5" id="mes-ano"></span>
+                    <button class="btn btn-outline-secondary" onclick="mudarMes(1)">
                         <i class="bi bi-chevron-right"></i>
                     </button>
                 </div>
-                
+
                 <div id="calendario"></div>
             </div>
         </div>
@@ -96,12 +96,12 @@
 
         document.getElementById('mes-ano').textContent = `${mesesNomes[mesAtual]} ${anoAtual}`;
 
-        let html = '<table style="width:100%; border-collapse:separate; border-spacing:3px;">';
-        
+        let html = '<table style="width:100%; border-collapse:separate; border-spacing:5px;">';
+
         // Cabeçalho
         html += '<tr>';
         ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'].forEach(d => {
-            html += `<th style="text-align:center; font-size:0.8rem; color:#6c757d; padding:4px;">${d}</th>`;
+            html += `<th style="text-align:center; font-size:0.95rem; color:#6c757d; padding:6px; font-weight:600;">${d}</th>`;
         });
         html += '</tr><tr>';
 
@@ -122,9 +122,9 @@
             const url = `/agendar/${prestadorId}/${servicoId}/${dataStr}/`;
 
             if (desabilitado) {
-                html += `<td style="text-align:center;"><div style="height:36px; width:36px; margin:auto; background:#f0f0f0; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:0.85rem; color:#aaa;">${dia}</div></td>`;
+                html += `<td style="text-align:center;"><div style="height:46px; width:46px; margin:auto; background:#f0f0f0; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:1rem; color:#aaa;">${dia}</div></td>`;
             } else {
-                html += `<td style="text-align:center;"><a href="${url}" style="height:36px; width:36px; margin:auto; border:1px solid #dee2e6; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:0.85rem; color:#333; text-decoration:none;" onmouseover="this.style.background='#6c63ff';this.style.color='white';" onmouseout="this.style.background='';this.style.color='#333';">${dia}</a></td>`;
+                html += `<td style="text-align:center;"><a href="${url}" style="height:46px; width:46px; margin:auto; border:1px solid #dee2e6; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:1rem; color:#333; text-decoration:none;" onmouseover="this.style.background='#6c63ff';this.style.color='white';" onmouseout="this.style.background='';this.style.color='#333';">${dia}</a></td>`;
             }
 
             colAtual++;
