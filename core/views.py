@@ -375,3 +375,54 @@ def cancelar_agendamento(request, agendamento_id):
     agendamento.save()
     messages.success(request, 'Agendamento cancelado com sucesso!')
     return redirect('meus_agendamentos')
+
+def agenda_prestador(request):
+    if not request.session.get('usuario_id'):
+        return redirect('login')
+    if request.session.get('usuario_tipo') != 'prestador':
+        return redirect('dashboard_cliente')
+
+    usuario = Usuario.objects.get(id=request.session.get('usuario_id'))
+    prestador = Prestador.objects.get(usuario=usuario)
+
+    data_filtro = request.GET.get('data', str(date.today()))
+    data = date.fromisoformat(data_filtro)
+
+    agendamentos = Agendamento.objects.filter(
+        prestador=prestador,
+        data_hora__date=data,
+    ).exclude(status='cancelado').order_by('data_hora')
+
+    context = {
+        'prestador': prestador,
+        'agendamentos': agendamentos,
+        'data': data,
+        'nome': request.session.get('usuario_nome'),
+    }
+    return render(request, 'core/agenda_prestador.html', context)
+
+
+def confirmar_agendamento_prestador(request, agendamento_id):
+    if not request.session.get('usuario_id'):
+        return redirect('login')
+    if request.session.get('usuario_tipo') != 'prestador':
+        return redirect('dashboard_cliente')
+
+    agendamento = Agendamento.objects.get(id=agendamento_id)
+    agendamento.status = 'confirmado'
+    agendamento.save()
+    messages.success(request, 'Agendamento confirmado com sucesso!')
+    return redirect('agenda_prestador')
+
+
+def cancelar_agendamento_prestador(request, agendamento_id):
+    if not request.session.get('usuario_id'):
+        return redirect('login')
+    if request.session.get('usuario_tipo') != 'prestador':
+        return redirect('dashboard_cliente')
+
+    agendamento = Agendamento.objects.get(id=agendamento_id)
+    agendamento.status = 'cancelado'
+    agendamento.save()
+    messages.success(request, 'Agendamento cancelado com sucesso!')
+    return redirect('agenda_prestador')

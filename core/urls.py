@@ -22,4 +22,7 @@ urlpatterns = [
     path('api/prestadores/', api.api_prestadores, name='api_prestadores'),
     path('api/servicos/<int:prestador_id>/', api.api_servicos, name='api_servicos'),
     path('api/horarios/<int:prestador_id>/<int:servico_id>/<str:data_str>/', api.api_horarios, name='api_horarios'),
+    path('agenda/', views.agenda_prestador, name='agenda_prestador'),
+    path('agenda/confirmar/<int:agendamento_id>/', views.confirmar_agendamento_prestador, name='confirmar_agendamento_prestador'),
+    path('agenda/cancelar/<int:agendamento_id>/', views.cancelar_agendamento_prestador, name='cancelar_agendamento_prestador'),
 ]
