@@ -94,6 +94,10 @@
         const ultimoDia = new Date(anoAtual, mesAtual + 1, 0);
         const iniciaSemana = primeiroDia.getDay();
 
+        // fixando o prazo
+        const limite = new Date(hoje);
+        limite.setDate(limite.getDate() + 60);
+
         document.getElementById('mes-ano').textContent = `${mesesNomes[mesAtual]} ${anoAtual}`;
 
         let html = '<table style="width:100%; border-collapse:separate; border-spacing:5px;">';
@@ -116,7 +120,8 @@
             const data = new Date(anoAtual, mesAtual, dia);
             const passado = data <= hoje;
             const funciona = diaFuncionamento(data);
-            const desabilitado = passado || !funciona;
+            // const desabilitado = passado || !funciona;
+            const desabilitado = passado || !funciona || data > limite;
 
             const dataStr = `${anoAtual}-${String(mesAtual + 1).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
             const url = `/agendar/${prestadorId}/${servicoId}/${dataStr}/`;
