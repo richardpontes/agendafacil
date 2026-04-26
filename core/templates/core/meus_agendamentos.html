@@ -32,9 +32,11 @@
     <div class="flex-grow-1 p-4">
         <h4 class="fw-bold mb-4">Meus Agendamentos</h4>
 
-        {% if agendamentos %}
-        <div class="d-flex flex-column gap-3">
-            {% for ag in agendamentos %}
+        <!-- Próximos -->
+        <h5 class="fw-semibold text-primario mb-3">Próximos</h5>
+        {% if proximos %}
+        <div class="d-flex flex-column gap-3 mb-4">
+            {% for ag in proximos %}
             <div class="card border-0 shadow-sm">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-start">
@@ -47,21 +49,14 @@
                         <div class="text-end">
                             {% if ag.status == 'pendente' %}
                                 <span class="badge bg-warning text-dark mb-2 d-block">Pendente</span>
-                                <a href="{% url 'cancelar_agendamento' ag.id %}" 
-                                   class="btn btn-outline-danger btn-sm"
-                                   onclick="return confirm('Confirma o cancelamento deste agendamento?')">
-                                    Cancelar
-                                </a>
                             {% elif ag.status == 'confirmado' %}
                                 <span class="badge bg-success mb-2 d-block">Confirmado</span>
-                                <a href="{% url 'cancelar_agendamento' ag.id %}" 
-                                   class="btn btn-outline-danger btn-sm"
-                                   onclick="return confirm('Confirma o cancelamento deste agendamento?')">
-                                    Cancelar
-                                </a>
-                            {% elif ag.status == 'cancelado' %}
-                                <span class="badge bg-danger">Cancelado</span>
                             {% endif %}
+                            <a href="{% url 'cancelar_agendamento' ag.id %}"
+                               class="btn btn-outline-danger btn-sm"
+                               onclick="return confirm('Confirma o cancelamento deste agendamento?')">
+                                Cancelar
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -69,13 +64,65 @@
             {% endfor %}
         </div>
         {% else %}
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body text-center py-4 text-muted">
+                <p class="mb-0">Nenhum agendamento futuro.</p>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Realizados -->
+        <h5 class="fw-semibold text-primario mb-3">Realizados</h5>
+        {% if realizados %}
+        <div class="d-flex flex-column gap-3 mb-4">
+            {% for ag in realizados %}
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h5 class="fw-bold mb-1">{{ ag.servico.nome }}</h5>
+                            <p class="text-muted mb-1"><i class="bi bi-shop me-1"></i>{{ ag.prestador.nome_negocio }}</p>
+                            <p class="text-muted mb-1"><i class="bi bi-calendar me-1"></i>{{ ag.data_hora|date:"d/m/Y" }} às {{ ag.data_hora|date:"H:i" }}</p>
+                            <p class="text-muted mb-0"><i class="bi bi-clock me-1"></i>{{ ag.servico.duracao }} min · R$ {{ ag.servico.preco }}</p>
+                        </div>
+                        <span class="badge bg-success">Realizado</span>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body text-center py-4 text-muted">
+                <p class="mb-0">Nenhum agendamento realizado.</p>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Cancelados -->
+        <h5 class="fw-semibold text-primario mb-3">Cancelados</h5>
+        {% if cancelados %}
+        <div class="d-flex flex-column gap-3">
+            {% for ag in cancelados %}
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h5 class="fw-bold mb-1">{{ ag.servico.nome }}</h5>
+                            <p class="text-muted mb-1"><i class="bi bi-shop me-1"></i>{{ ag.prestador.nome_negocio }}</p>
+                            <p class="text-muted mb-1"><i class="bi bi-calendar me-1"></i>{{ ag.data_hora|date:"d/m/Y" }} às {{ ag.data_hora|date:"H:i" }}</p>
+                            <p class="text-muted mb-0"><i class="bi bi-clock me-1"></i>{{ ag.servico.duracao }} min · R$ {{ ag.servico.preco }}</p>
+                        </div>
+                        <span class="badge bg-danger">Cancelado</span>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
         <div class="card border-0 shadow-sm">
-            <div class="card-body text-center py-5">
-                <i class="bi bi-calendar-x fs-1 text-muted mb-3 d-block"></i>
-                <p class="text-muted">Você ainda não tem agendamentos.</p>
-                <a href="{% url 'listar_prestadores' %}" class="btn btn-primario">
-                    Agendar agora
-                </a>
+            <div class="card-body text-center py-4 text-muted">
+                <p class="mb-0">Nenhum agendamento cancelado.</p>
             </div>
         </div>
         {% endif %}

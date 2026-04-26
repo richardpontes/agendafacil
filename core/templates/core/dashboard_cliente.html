@@ -44,7 +44,7 @@
                 <div class="card border-0 shadow-sm">
                     <div class="card-body text-center">
                         <i class="bi bi-calendar fs-2 text-primario"></i>
-                        <h3 class="fw-bold mt-2">0</h3>
+                        <h3 class="fw-bold mt-2">{{ agendamentos_futuros }}</h3>
                         <p class="text-muted mb-0">Agendamentos futuros</p>
                     </div>
                 </div>
@@ -53,7 +53,7 @@
                 <div class="card border-0 shadow-sm">
                     <div class="card-body text-center">
                         <i class="bi bi-check-circle fs-2 text-primario"></i>
-                        <h3 class="fw-bold mt-2">0</h3>
+                        <h3 class="fw-bold mt-2">{{ agendamentos_realizados }}</h3>
                         <p class="text-muted mb-0">Agendamentos realizados</p>
                     </div>
                 </div>
@@ -62,7 +62,7 @@
                 <div class="card border-0 shadow-sm">
                     <div class="card-body text-center">
                         <i class="bi bi-clock fs-2 text-primario"></i>
-                        <h3 class="fw-bold mt-2">0</h3>
+                        <h3 class="fw-bold mt-2">{{ aguardando_confirmacao }}</h3>
                         <p class="text-muted mb-0">Aguardando confirmação</p>
                     </div>
                 </div>
@@ -76,13 +76,30 @@
                     <h5 class="fw-bold mb-0">Próximos Agendamentos</h5>
                     <a href="{% url 'listar_prestadores' %}" class="btn btn-primario btn-sm">+ Novo Agendamento</a>
                 </div>
+                {% if proximos_agendamentos %}
+                    {% for ag in proximos_agendamentos %}
+                    <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                        <div>
+                            <span class="fw-semibold">{{ ag.servico.nome }}</span>
+                            <small class="text-muted d-block">{{ ag.prestador.nome_negocio }}</small>
+                            <small class="text-muted">{{ ag.data_hora|date:"d/m/Y" }} às {{ ag.data_hora|date:"H:i" }}</small>
+                        </div>
+                        {% if ag.status == 'pendente' %}
+                            <span class="badge bg-warning text-dark">Pendente</span>
+                        {% elif ag.status == 'confirmado' %}
+                            <span class="badge bg-success">Confirmado</span>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                {% else %}
                 <div class="text-center py-4 text-muted">
                     <i class="bi bi-calendar-x fs-1 mb-2 d-block"></i>
                     Você não tem agendamentos futuros.<br>
                     <a href="{% url 'listar_prestadores' %}" class="text-primario text-decoration-none">Agendar agora</a>
                 </div>
+                {% endif %}
             </div>
-        </div>
+        </div>        
     </div>
 </div>
 {% endblock %}

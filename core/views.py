@@ -114,8 +114,39 @@ def dashboard_cliente(request):
     if not request.session.get('usuario_id'):
         return redirect('login')
 
+    usuario = Usuario.objects.get(id=request.session.get('usuario_id'))
+    hoje = date.today()
+
+    agendamentos_futuros = Agendamento.objects.filter(
+        cliente=usuario,
+        data_hora__date__gte=hoje,
+        status__in=['pendente', 'confirmado']
+    ).count()
+
+    agendamentos_realizados = Agendamento.objects.filter(
+        cliente=usuario,
+        data_hora__date__lt=hoje,
+        status='confirmado'
+    ).count()
+
+    aguardando_confirmacao = Agendamento.objects.filter(
+        cliente=usuario,
+        status='pendente',
+        data_hora__date__gte=hoje
+    ).count()
+
+    proximos_agendamentos = Agendamento.objects.filter(
+        cliente=usuario,
+        data_hora__date__gte=hoje,
+        status__in=['pendente', 'confirmado']
+    ).order_by('data_hora')[:5]
+
     context = {
         'nome': request.session.get('usuario_nome'),
+        'agendamentos_futuros': agendamentos_futuros,
+        'agendamentos_realizados': agendamentos_realizados,
+        'aguardando_confirmacao': aguardando_confirmacao,
+        'proximos_agendamentos': proximos_agendamentos,
     }
     return render(request, 'core/dashboard_cliente.html', context)
 
@@ -354,12 +385,29 @@ def meus_agendamentos(request):
         return redirect('dashboard_prestador')
 
     usuario = Usuario.objects.get(id=request.session.get('usuario_id'))
-    agendamentos = Agendamento.objects.filter(
-        cliente=usuario
+    hoje = date.today()
+
+    proximos = Agendamento.objects.filter(
+        cliente=usuario,
+        data_hora__date__gte=hoje,
+        status__in=['pendente', 'confirmado']
+    ).order_by('data_hora')
+
+    realizados = Agendamento.objects.filter(
+        cliente=usuario,
+        data_hora__date__lt=hoje,
+        status='confirmado'
+    ).order_by('-data_hora')
+
+    cancelados = Agendamento.objects.filter(
+        cliente=usuario,
+        status='cancelado'
     ).order_by('-data_hora')
 
     context = {
-        'agendamentos': agendamentos,
+        'proximos': proximos,
+        'realizados': realizados,
+        'cancelados': cancelados,
         'nome': request.session.get('usuario_nome'),
     }
     return render(request, 'core/meus_agendamentos.html', context)
