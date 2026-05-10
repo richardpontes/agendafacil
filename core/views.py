@@ -163,9 +163,43 @@ def dashboard_prestador(request):
     except (Usuario.DoesNotExist, Prestador.DoesNotExist):
         return redirect('login')
 
+    hoje = date.today()
+    inicio_semana = hoje - timedelta(days=hoje.weekday())
+    fim_semana = inicio_semana + timedelta(days=6)
+
+    agendamentos_hoje = Agendamento.objects.filter(
+        prestador=prestador,
+        data_hora__date=hoje,
+    ).exclude(status='cancelado').count()
+
+    pendentes_confirmacao = Agendamento.objects.filter(
+        prestador=prestador,
+        status='pendente',
+        data_hora__date__gte=hoje,
+    ).count()
+
+    clientes_semana = Agendamento.objects.filter(
+        prestador=prestador,
+        data_hora__date__range=[inicio_semana, fim_semana],
+        status='confirmado',
+    ).values('cliente').distinct().count()
+
+    servicos_cadastrados = Servico.objects.filter(prestador=prestador).count()
+
+    agendamentos_hoje_lista = Agendamento.objects.filter(
+        prestador=prestador,
+        data_hora__date=hoje,
+    ).exclude(status='cancelado').order_by('data_hora')
+
     context = {
         'nome': request.session.get('usuario_nome'),
         'prestador': prestador,
+        'agendamentos_hoje': agendamentos_hoje,
+        'pendentes_confirmacao': pendentes_confirmacao,
+        'clientes_semana': clientes_semana,
+        'servicos_cadastrados': servicos_cadastrados,
+        'agendamentos_hoje_lista': agendamentos_hoje_lista,
+        'hoje': hoje,
     }
     return render(request, 'core/dashboard_prestador.html', context)
 
@@ -200,6 +234,7 @@ def novo_servico(request):
         descricao = request.POST.get('descricao')
         duracao = request.POST.get('duracao')
         preco = request.POST.get('preco')
+        profissional = request.POST.get('profissional')
 
         Servico.objects.create(
             prestador=prestador,
@@ -207,6 +242,7 @@ def novo_servico(request):
             descricao=descricao,
             duracao=duracao,
             preco=preco,
+            profissional=profissional,
         )
         messages.success(request, 'Serviço cadastrado com sucesso!')
         return redirect('listar_servicos')
@@ -228,6 +264,7 @@ def editar_servico(request, id):
         servico.duracao = request.POST.get('duracao')
         servico.preco = request.POST.get('preco').replace(',', '.')
         servico.ativo = request.POST.get('ativo') == 'on'
+        servico.profissional = request.POST.get('profissional')
         servico.save()
         messages.success(request, 'Serviço atualizado com sucesso!')
         return redirect('listar_servicos')
@@ -295,12 +332,12 @@ def selecionar_data(request, prestador_id, servico_id):
 
     # Gera os próximos 30 dias
     hoje = date.today()
-    datas = [hoje + timedelta(days=i) for i in range(1, 31)]
+    # datas = [hoje + timedelta(days=i) for i in range(1, 31)]
 
     context = {
         'prestador': prestador,
         'servico': servico,
-        'datas': datas,
+        # 'datas': datas,
         'nome': request.session.get('usuario_nome'),
     }
     return render(request, 'core/selecionar_data.html', context)
@@ -315,25 +352,42 @@ def selecionar_horario(request, prestador_id, servico_id, data_str):
     servico = Servico.objects.get(id=servico_id)
     data = date.fromisoformat(data_str)
 
-    # Gera slots de horário baseado no horário do prestador
-    slots = []
     import pytz
     tz = pytz.timezone('America/Sao_Paulo')
-    hora_atual = tz.localize(datetime.combine(data, prestador.horario_inicio))
+    hora_inicio = tz.localize(datetime.combine(data, prestador.horario_inicio))
     hora_fim = tz.localize(datetime.combine(data, prestador.horario_fim))
+    slot_base = timedelta(minutes=15)
     duracao = timedelta(minutes=servico.duracao)
+    slots_necessarios = servico.duracao // 15
 
+    # Busca todos os agendamentos da profissional naquele dia
+    agendamentos_profissional = Agendamento.objects.filter(
+        prestador=prestador,
+        servico__profissional=servico.profissional,
+        data_hora__date=data,
+        status__in=['pendente', 'confirmado']
+    ).select_related('servico')
+
+    # Monta conjunto de slots de 15 min ocupados
+    slots_ocupados = set()
+    for ag in agendamentos_profissional:
+        inicio_ag = ag.data_hora
+        slots_ag = ag.servico.duracao // 15
+        for i in range(slots_ag):
+            slots_ocupados.add(inicio_ag + timedelta(minutes=15 * i))
+
+    # Gera slots disponíveis
+    slots = []
+    hora_atual = hora_inicio
     while hora_atual + duracao <= hora_fim:
-        # Verifica se já existe agendamento nesse horário
-        ocupado = Agendamento.objects.filter(
-            prestador=prestador,
-            data_hora=hora_atual,
-            status__in=['pendente', 'confirmado']
-        ).exists()
-
-        if not ocupado:
+        # Verifica se todos os slots necessários estão livres
+        livre = all(
+            hora_atual + timedelta(minutes=15 * i) not in slots_ocupados
+            for i in range(slots_necessarios)
+        )
+        if livre:
             slots.append(hora_atual.time())
-        hora_atual += duracao
+        hora_atual += slot_base
 
     context = {
         'prestador': prestador,

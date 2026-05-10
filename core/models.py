@@ -59,6 +59,7 @@ class Servico(models.Model):
     duracao = models.IntegerField()
     preco = models.DecimalField(max_digits=10, decimal_places=2)
     ativo = models.BooleanField(default=True)
+    profissional = models.CharField(max_length=100, default='')
 
     def __str__(self):
         return self.nome

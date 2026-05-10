@@ -118,7 +118,7 @@
 
         for (let dia = 1; dia <= ultimoDia.getDate(); dia++) {
             const data = new Date(anoAtual, mesAtual, dia);
-            const passado = data <= hoje;
+            const passado = data < hoje;
             const funciona = diaFuncionamento(data);
             // const desabilitado = passado || !funciona;
             const desabilitado = passado || !funciona || data > limite;

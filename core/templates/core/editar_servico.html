@@ -52,6 +52,10 @@
                         <label class="form-label fw-semibold">Descrição</label>
                         <textarea name="descricao" class="form-control" rows="3">{{ servico.descricao }}</textarea>
                     </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Profissional Responsável</label>
+                        <input type="text" name="profissional" class="form-control" value="{{ servico.profissional }}" required>
+                    </div>
                     <div class="row">
                         <div class="col-6 mb-3">
                             <label class="form-label fw-semibold">Duração (minutos)</label>

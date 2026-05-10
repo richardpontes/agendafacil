@@ -8,7 +8,7 @@
     <div class="d-flex flex-column p-3" style="width: 250px; flex-shrink: 0; background-color: #6c63ff; min-height: 100vh;">
         <h5 class="text-white fw-bold mb-4 mt-2">AgendaFácil</h5>
         <nav class="nav flex-column gap-2">
-            <a href="{% url 'dashboard_prestador' %}" class="nav-link text-white">
+            <a href="{% url 'dashboard_prestador' %}" class="nav-link text-white fw-bold">
                 <i class="bi bi-house me-2"></i>Início
             </a>
             <a href="{% url 'agenda_prestador' %}" class="nav-link text-white">
@@ -49,8 +49,9 @@
             <div class="col-md-3">
                 <div class="card border-0 shadow-sm">
                     <div class="card-body text-center">
-                        <i class="bi bi-calendar-day fs-2 text-primario"></i>
-                        <h3 class="fw-bold mt-2">0</h3>
+                        <!--<i class="bi bi-calendar-day fs-2 text-primario"></i>-->
+                        <i class="bi bi-calendar3 fs-2 text-primario"></i>
+                        <h3 class="fw-bold mt-2">{{ agendamentos_hoje }}</h3>
                         <p class="text-muted mb-0">Agendamentos hoje</p>
                     </div>
                 </div>
@@ -59,7 +60,7 @@
                 <div class="card border-0 shadow-sm">
                     <div class="card-body text-center">
                         <i class="bi bi-clock fs-2 text-primario"></i>
-                        <h3 class="fw-bold mt-2">0</h3>
+                        <h3 class="fw-bold mt-2">{{ pendentes_confirmacao }}</h3>
                         <p class="text-muted mb-0">Pendentes de confirmação</p>
                     </div>
                 </div>
@@ -68,7 +69,7 @@
                 <div class="card border-0 shadow-sm">
                     <div class="card-body text-center">
                         <i class="bi bi-people fs-2 text-primario"></i>
-                        <h3 class="fw-bold mt-2">0</h3>
+                        <h3 class="fw-bold mt-2">{{ clientes_semana }}</h3>
                         <p class="text-muted mb-0">Clientes esta semana</p>
                     </div>
                 </div>
@@ -77,7 +78,7 @@
                 <div class="card border-0 shadow-sm">
                     <div class="card-body text-center">
                         <i class="bi bi-grid fs-2 text-primario"></i>
-                        <h3 class="fw-bold mt-2">0</h3>
+                        <h3 class="fw-bold mt-2">{{ servicos_cadastrados }}</h3>
                         <p class="text-muted mb-0">Serviços cadastrados</p>
                     </div>
                 </div>
@@ -88,13 +89,32 @@
         <div class="card border-0 shadow-sm">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h5 class="fw-bold mb-0">Agendamentos de Hoje</h5>
+                    <h5 class="fw-bold mb-0">Agendamentos de Hoje — {{ hoje|date:"d/m/Y" }} ({{ hoje|date:"l" }})</h5>
                     <span class="text-muted small">{{ prestador.horario_inicio }} — {{ prestador.horario_fim }}</span>
                 </div>
+                {% if agendamentos_hoje_lista %}
+                <div class="d-flex flex-column gap-2">
+                    {% for ag in agendamentos_hoje_lista %}
+                    <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                        <div>
+                            <span class="fw-semibold">{{ ag.servico.nome }}</span>
+                            <small class="text-muted d-block">{{ ag.cliente.nome }}</small>
+                            <small class="text-muted">{{ ag.data_hora|date:"H:i" }}</small>
+                        </div>
+                        {% if ag.status == 'pendente' %}
+                            <span class="badge bg-warning text-dark">Pendente</span>
+                        {% elif ag.status == 'confirmado' %}
+                            <span class="badge bg-success">Confirmado</span>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
                 <div class="text-center py-4 text-muted">
                     <i class="bi bi-calendar-x fs-1 mb-2 d-block"></i>
                     Nenhum agendamento para hoje.
                 </div>
+                {% endif %}
             </div>
         </div>
     </div>
