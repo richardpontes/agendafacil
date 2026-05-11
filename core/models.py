@@ -93,6 +93,7 @@ class Bloqueio(models.Model):
     data_hora_inicio = models.DateTimeField()
     data_hora_fim = models.DateTimeField()
     motivo = models.CharField(max_length=200, blank=True, null=True)
+    profissional = models.CharField(max_length=100, default='')
 
     def __str__(self):
         return f'{self.prestador} - {self.data_hora_inicio}'

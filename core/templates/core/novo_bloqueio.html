@@ -1,6 +1,6 @@
 {% extends 'core/base.html' %}
 
-{% block title %}Novo Serviço — AgendaFácil{% endblock %}
+{% block title %}Novo Bloqueio — AgendaFácil{% endblock %}
 
 {% block content %}
 <div class="d-flex" style="min-height: 100vh;">
@@ -14,10 +14,10 @@
             <a href="{% url 'agenda_prestador' %}" class="nav-link text-white">
                 <i class="bi bi-calendar2-week me-2"></i>Minha Agenda
             </a>
-            <a href="{% url 'listar_servicos' %}" class="nav-link text-white fw-bold">
+            <a href="{% url 'listar_servicos' %}" class="nav-link text-white">
                 <i class="bi bi-scissors me-2"></i>Meus Serviços
             </a>
-            <a href="{% url 'listar_bloqueios' %}" class="nav-link text-white">
+            <a href="{% url 'listar_bloqueios' %}" class="nav-link text-white fw-bold">
                 <i class="bi bi-slash-circle me-2"></i>Bloqueios
             </a>
             <a href="#" class="nav-link text-white">
@@ -34,10 +34,10 @@
     <!-- Conteúdo principal -->
     <div class="flex-grow-1 p-4">
         <div class="d-flex align-items-center mb-4">
-            <a href="{% url 'listar_servicos' %}" class="btn btn-outline-secondary btn-sm me-3">
+            <a href="{% url 'listar_bloqueios' %}" class="btn btn-outline-secondary btn-sm me-3">
                 <i class="bi bi-arrow-left"></i>
             </a>
-            <h4 class="fw-bold mb-0">Novo Serviço</h4>
+            <h4 class="fw-bold mb-0">Novo Bloqueio</h4>
         </div>
 
         <div class="card border-0 shadow-sm" style="max-width: 600px;">
@@ -45,30 +45,29 @@
                 <form method="POST">
                     {% csrf_token %}
                     <div class="mb-3">
-                        <label class="form-label fw-semibold">Nome do Serviço</label>
-                        <input type="text" name="nome" class="form-control" placeholder="Ex: Corte Feminino" required>
+                        <label class="form-label fw-semibold">Profissional</label>
+                        <select name="profissional" class="form-select" required>
+                            <option value="">Selecione...</option>
+                            {% for prof in profissionais %}
+                            <option value="{{ prof }}" {% if prof == profissional_selecionado %}selected{% endif %}>{{ prof }}</option>
+                            {% endfor %}
+                        </select>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label fw-semibold">Descrição</label>
-                        <textarea name="descricao" class="form-control" rows="3" placeholder="Descreva o serviço..."></textarea>
+                        <label class="form-label fw-semibold">Data e hora de início</label>
+                        <input type="datetime-local" name="data_hora_inicio" class="form-control" value="{{ data_hora_inicio }}" required>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label fw-semibold">Profissional Responsável</label>
-                        <input type="text" name="profissional" class="form-control" placeholder="Ex: Ana Paula" required>
+                        <label class="form-label fw-semibold">Data e hora de fim</label>
+                        <input type="datetime-local" name="data_hora_fim" class="form-control" value="{{ data_hora_fim }}" required>
                     </div>
-                    <div class="row">
-                        <div class="col-6 mb-3">
-                            <label class="form-label fw-semibold">Duração (minutos)</label>
-                            <input type="number" name="duracao" class="form-control" placeholder="Ex: 60" min="15" required>
-                        </div>
-                        <div class="col-6 mb-3">
-                            <label class="form-label fw-semibold">Preço (R$)</label>
-                            <input type="number" name="preco" class="form-control" placeholder="Ex: 80,00" step="0.01" min="0" required>
-                        </div>
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">Motivo (opcional)</label>
+                        <input type="text" name="motivo" class="form-control" placeholder="Ex: Consulta médica, folga..." value="{{ motivo }}">
                     </div>
-                    <div class="d-flex gap-2 mt-2">
-                        <button type="submit" class="btn btn-primario px-4">Salvar Serviço</button>
-                        <a href="{% url 'listar_servicos' %}" class="btn btn-outline-secondary px-4">Cancelar</a>
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primario px-4">Salvar Bloqueio</button>
+                        <a href="{% url 'listar_bloqueios' %}" class="btn btn-outline-secondary px-4">Cancelar</a>
                     </div>
                 </form>
             </div>

@@ -2,7 +2,7 @@ from django.utils import timezone
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth.hashers import make_password, check_password
-from .models import Usuario, Prestador, Servico, Agendamento
+from .models import Usuario, Prestador, Servico, Agendamento, Bloqueio
 
 
 def index(request):
@@ -368,13 +368,28 @@ def selecionar_horario(request, prestador_id, servico_id, data_str):
         status__in=['pendente', 'confirmado']
     ).select_related('servico')
 
+    # Busca bloqueios da profissional que interceptam o dia
+    bloqueios_profissional = Bloqueio.objects.filter(
+        prestador=prestador,
+        profissional=servico.profissional,
+        data_hora_inicio__date__lte=data,
+        data_hora_fim__date__gte=data,
+    )
+
     # Monta conjunto de slots de 15 min ocupados
     slots_ocupados = set()
+
     for ag in agendamentos_profissional:
         inicio_ag = ag.data_hora
         slots_ag = ag.servico.duracao // 15
         for i in range(slots_ag):
             slots_ocupados.add(inicio_ag + timedelta(minutes=15 * i))
+
+    for bloqueio in bloqueios_profissional:
+        slot_atual = bloqueio.data_hora_inicio
+        while slot_atual < bloqueio.data_hora_fim:
+            slots_ocupados.add(slot_atual)
+            slot_atual += timedelta(minutes=15)
 
     # Gera slots disponíveis
     slots = []
@@ -477,6 +492,104 @@ def cancelar_agendamento(request, agendamento_id):
     agendamento.save()
     messages.success(request, 'Agendamento cancelado com sucesso!')
     return redirect('meus_agendamentos')
+
+def listar_bloqueios(request):
+    if not request.session.get('usuario_id'):
+        return redirect('login')
+    if request.session.get('usuario_tipo') != 'prestador':
+        return redirect('dashboard_cliente')
+
+    usuario = Usuario.objects.get(id=request.session.get('usuario_id'))
+    prestador = Prestador.objects.get(usuario=usuario)
+    bloqueios = Bloqueio.objects.filter(prestador=prestador).order_by('data_hora_inicio')
+
+    context = {
+        'bloqueios': bloqueios,
+        'nome': request.session.get('usuario_nome'),
+        'prestador': prestador,
+    }
+    return render(request, 'core/bloqueios.html', context)
+
+
+def novo_bloqueio(request):
+    if not request.session.get('usuario_id'):
+        return redirect('login')
+    if request.session.get('usuario_tipo') != 'prestador':
+        return redirect('dashboard_cliente')
+
+    usuario = Usuario.objects.get(id=request.session.get('usuario_id'))
+    prestador = Prestador.objects.get(usuario=usuario)
+
+    # Lista de profissionais únicas do prestador
+    profissionais = Servico.objects.filter(
+        prestador=prestador
+    ).values_list('profissional', flat=True).distinct()
+
+    if request.method == 'POST':
+        profissional = request.POST.get('profissional')
+        data_hora_inicio = request.POST.get('data_hora_inicio')
+        data_hora_fim = request.POST.get('data_hora_fim')
+        motivo = request.POST.get('motivo')
+
+        import pytz
+        tz = pytz.timezone('America/Sao_Paulo')
+        data_hora_inicio_dt = tz.localize(datetime.fromisoformat(data_hora_inicio))
+        data_hora_fim_dt = tz.localize(datetime.fromisoformat(data_hora_fim))
+
+        # Verifica se há agendamentos conflitantes
+        agendamentos_conflito = Agendamento.objects.filter(
+            prestador=prestador,
+            servico__profissional=profissional,
+            status__in=['pendente', 'confirmado'],
+        ).select_related('servico')
+
+        conflito = any(
+            ag.data_hora < data_hora_fim_dt and
+            ag.data_hora + timedelta(minutes=ag.servico.duracao) > data_hora_inicio_dt
+            for ag in agendamentos_conflito
+        )
+
+        if conflito:
+            messages.error(request, 'Existe um agendamento nesse período para essa profissional. Bloqueio não cadastrado.')
+            context = {
+                'nome': request.session.get('usuario_nome'),
+                'prestador': prestador,
+                'profissionais': profissionais,
+                'profissional_selecionado': profissional,
+                'data_hora_inicio': data_hora_inicio,
+                'data_hora_fim': data_hora_fim,
+                'motivo': motivo,
+            }
+            return render(request, 'core/novo_bloqueio.html', context)
+
+        Bloqueio.objects.create(
+            prestador=prestador,
+            profissional=profissional,
+            data_hora_inicio=data_hora_inicio,
+            data_hora_fim=data_hora_fim,
+            motivo=motivo,
+        )
+        messages.success(request, 'Bloqueio cadastrado com sucesso!')
+        return redirect('listar_bloqueios')
+
+    context = {
+        'nome': request.session.get('usuario_nome'),
+        'prestador': prestador,
+        'profissionais': profissionais,
+    }
+    return render(request, 'core/novo_bloqueio.html', context)
+
+
+def excluir_bloqueio(request, bloqueio_id):
+    if not request.session.get('usuario_id'):
+        return redirect('login')
+    if request.session.get('usuario_tipo') != 'prestador':
+        return redirect('dashboard_cliente')
+
+    bloqueio = Bloqueio.objects.get(id=bloqueio_id)
+    bloqueio.delete()
+    messages.success(request, 'Bloqueio removido com sucesso!')
+    return redirect('listar_bloqueios')
 
 def agenda_prestador(request):
     if not request.session.get('usuario_id'):

@@ -25,4 +25,7 @@ urlpatterns = [
     path('agenda/', views.agenda_prestador, name='agenda_prestador'),
     path('agenda/confirmar/<int:agendamento_id>/', views.confirmar_agendamento_prestador, name='confirmar_agendamento_prestador'),
     path('agenda/cancelar/<int:agendamento_id>/', views.cancelar_agendamento_prestador, name='cancelar_agendamento_prestador'),
+    path('bloqueios/', views.listar_bloqueios, name='listar_bloqueios'),
+    path('bloqueios/novo/', views.novo_bloqueio, name='novo_bloqueio'),
+    path('bloqueios/excluir/<int:bloqueio_id>/', views.excluir_bloqueio, name='excluir_bloqueio'),
 ]
