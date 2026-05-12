@@ -591,6 +591,66 @@ def excluir_bloqueio(request, bloqueio_id):
     messages.success(request, 'Bloqueio removido com sucesso!')
     return redirect('listar_bloqueios')
 
+def perfil(request):
+    if not request.session.get('usuario_id'):
+        return redirect('login')
+
+    usuario = Usuario.objects.get(id=request.session.get('usuario_id'))
+
+    if request.method == 'POST':
+        nome = request.POST.get('nome')
+        telefone = request.POST.get('telefone')
+        senha_atual = request.POST.get('senha_atual')
+        nova_senha = request.POST.get('nova_senha')
+        confirmar_nova_senha = request.POST.get('confirmar_nova_senha')
+
+        usuario.nome = nome
+        usuario.telefone = telefone
+
+        if senha_atual or nova_senha or confirmar_nova_senha:
+            if not check_password(senha_atual, usuario.senha):
+                messages.error(request, 'Senha atual incorreta.')
+                return redirect('perfil')
+            if nova_senha != confirmar_nova_senha:
+                messages.error(request, 'As novas senhas não coincidem.')
+                return redirect('perfil')
+            usuario.senha = make_password(nova_senha)
+
+        usuario.save()
+
+        if usuario.tipo == 'prestador':
+            prestador = Prestador.objects.get(usuario=usuario)
+            prestador.nome_negocio = request.POST.get('nome_negocio')
+            prestador.cep = request.POST.get('cep')
+            prestador.logradouro = request.POST.get('logradouro')
+            prestador.numero = request.POST.get('numero')
+            prestador.complemento = request.POST.get('complemento')
+            prestador.bairro = request.POST.get('bairro')
+            prestador.cidade = request.POST.get('cidade')
+            prestador.estado = request.POST.get('estado')
+            prestador.horario_inicio = request.POST.get('horario_inicio')
+            prestador.horario_fim = request.POST.get('horario_fim')
+            prestador.dia_inicio = request.POST.get('dia_inicio')
+            prestador.dia_fim = request.POST.get('dia_fim')
+            prestador.save()
+
+        request.session['usuario_nome'] = usuario.nome
+        messages.success(request, 'Perfil atualizado com sucesso!')
+        return redirect('perfil')
+
+    context = {
+        'usuario': usuario,
+        'nome': request.session.get('usuario_nome'),
+    }
+
+    if usuario.tipo == 'prestador':
+        prestador = Prestador.objects.get(usuario=usuario)
+        context['prestador'] = prestador
+        context['dias_choices'] = Prestador.DIAS_CHOICES
+        return render(request, 'core/perfil_prestador.html', context)
+
+    return render(request, 'core/perfil_cliente.html', context)
+
 def agenda_prestador(request):
     if not request.session.get('usuario_id'):
         return redirect('login')

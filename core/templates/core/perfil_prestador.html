@@ -1,0 +1,167 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Meu Perfil — AgendaFácil{% endblock %}
+
+{% block content %}
+<div class="d-flex" style="min-height: 100vh;">
+    <!-- Sidebar -->
+    <div class="d-flex flex-column p-3" style="width: 250px; flex-shrink: 0; background-color: #6c63ff; min-height: 100vh;">
+        <h5 class="text-white fw-bold mb-4 mt-2">AgendaFácil</h5>
+        <nav class="nav flex-column gap-2">
+            <a href="{% url 'dashboard_prestador' %}" class="nav-link text-white">
+                <i class="bi bi-house me-2"></i>Início
+            </a>
+            <a href="{% url 'agenda_prestador' %}" class="nav-link text-white">
+                <i class="bi bi-calendar2-week me-2"></i>Minha Agenda
+            </a>
+            <a href="{% url 'listar_servicos' %}" class="nav-link text-white">
+                <i class="bi bi-scissors me-2"></i>Meus Serviços
+            </a>
+            <a href="{% url 'listar_bloqueios' %}" class="nav-link text-white">
+                <i class="bi bi-slash-circle me-2"></i>Bloqueios
+            </a>
+            <a href="{% url 'perfil' %}" class="nav-link text-white fw-bold">
+                <i class="bi bi-person me-2"></i>Meu Perfil
+            </a>
+        </nav>
+        <div class="mt-auto">
+            <a href="{% url 'logout' %}" class="nav-link text-white">
+                <i class="bi bi-box-arrow-right me-2"></i>Sair
+            </a>
+        </div>
+    </div>
+
+    <!-- Conteúdo principal -->
+    <div class="flex-grow-1 p-4">
+        <h4 class="fw-bold mb-4">Meu Perfil</h4>
+
+        <div class="card border-0 shadow-sm" style="max-width: 600px;">
+            <div class="card-body p-4">
+                <form method="POST">
+                    {% csrf_token %}
+                    <h5 class="fw-semibold mb-3">Dados Pessoais</h5>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Nome completo</label>
+                        <input type="text" name="nome" class="form-control" value="{{ usuario.nome }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">E-mail</label>
+                        <input type="email" class="form-control" value="{{ usuario.email }}" disabled>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">Telefone</label>
+                        <input type="text" name="telefone" class="form-control" value="{{ usuario.telefone }}">
+                    </div>
+
+                    <h5 class="fw-semibold mb-3">Dados do Negócio</h5>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Nome do negócio</label>
+                        <input type="text" name="nome_negocio" class="form-control" value="{{ prestador.nome_negocio }}" required>
+                    </div>
+                    <div class="row">
+                        <div class="col-8 mb-3">
+                            <label class="form-label fw-semibold">CEP</label>
+                            <input type="text" name="cep" id="cep" class="form-control" value="{{ prestador.cep }}" maxlength="9">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Logradouro</label>
+                        <input type="text" name="logradouro" id="logradouro" class="form-control" value="{{ prestador.logradouro }}">
+                    </div>
+                    <div class="row">
+                        <div class="col-4 mb-3">
+                            <label class="form-label fw-semibold">Número</label>
+                            <input type="text" name="numero" class="form-control" value="{{ prestador.numero }}">
+                        </div>
+                        <div class="col-8 mb-3">
+                            <label class="form-label fw-semibold">Complemento</label>
+                            <input type="text" name="complemento" class="form-control" value="{{ prestador.complemento }}">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Bairro</label>
+                        <input type="text" name="bairro" id="bairro" class="form-control" value="{{ prestador.bairro }}">
+                    </div>
+                    <div class="row">
+                        <div class="col-8 mb-3">
+                            <label class="form-label fw-semibold">Cidade</label>
+                            <input type="text" name="cidade" id="cidade" class="form-control" value="{{ prestador.cidade }}">
+                        </div>
+                        <div class="col-4 mb-3">
+                            <label class="form-label fw-semibold">Estado</label>
+                            <input type="text" name="estado" id="estado" class="form-control" value="{{ prestador.estado }}" maxlength="2">
+                        </div>
+                    </div>
+
+                    <h5 class="fw-semibold mb-3">Horário de Funcionamento</h5>
+                    <div class="row">
+                        <div class="col-6 mb-3">
+                            <label class="form-label fw-semibold">Horário de início</label>
+                            <input type="time" name="horario_inicio" class="form-control" value="{{ prestador.horario_inicio }}">
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label class="form-label fw-semibold">Horário de fim</label>
+                            <input type="time" name="horario_fim" class="form-control" value="{{ prestador.horario_fim }}">
+                        </div>
+                    </div>
+                    <div class="row mb-4">
+                        <div class="col-6 mb-3">
+                            <label class="form-label fw-semibold">De</label>
+                            <select name="dia_inicio" class="form-select">
+                                {% for dia, label in dias_choices %}
+                                <option value="{{ dia }}" {% if dia == prestador.dia_inicio %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label class="form-label fw-semibold">Até</label>
+                            <select name="dia_fim" class="form-select">
+                                {% for dia, label in dias_choices %}
+                                <option value="{{ dia }}" {% if dia == prestador.dia_fim %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <h5 class="fw-semibold mb-3">Alterar Senha</h5>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Senha atual</label>
+                        <input type="password" name="senha_atual" class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Nova senha</label>
+                        <input type="password" name="nova_senha" class="form-control">
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">Confirmar nova senha</label>
+                        <input type="password" name="confirmar_nova_senha" class="form-control">
+                    </div>
+
+                    <button type="submit" class="btn btn-primario px-4">Salvar Alterações</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+document.getElementById('cep').addEventListener('blur', function() {
+    const cep = this.value.replace(/\D/g, '');
+    if (cep.length === 8) {
+        fetch(`https://viacep.com.br/ws/${cep}/json/`)
+            .then(res => res.json())
+            .then(data => {
+                if (!data.erro) {
+                    document.getElementById('logradouro').value = data.logradouro;
+                    document.getElementById('bairro').value = data.bairro;
+                    document.getElementById('cidade').value = data.localidade;
+                    document.getElementById('estado').value = data.uf;
+                }
+            });
+    }
+});
+</script>
+{% endblock %}
+
+{% endblock %}

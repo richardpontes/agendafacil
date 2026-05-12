@@ -28,4 +28,5 @@ urlpatterns = [
     path('bloqueios/', views.listar_bloqueios, name='listar_bloqueios'),
     path('bloqueios/novo/', views.novo_bloqueio, name='novo_bloqueio'),
     path('bloqueios/excluir/<int:bloqueio_id>/', views.excluir_bloqueio, name='excluir_bloqueio'),
+    path('perfil/', views.perfil, name='perfil'),
 ]
