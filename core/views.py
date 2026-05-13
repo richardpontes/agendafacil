@@ -430,7 +430,10 @@ def confirmar_agendamento(request, prestador_id, servico_id, data_str, horario_s
     servico = Servico.objects.get(id=servico_id)
     data = date.fromisoformat(data_str)
     horario = datetime.strptime(horario_str, '%H:%M').time()
-    data_hora = datetime.combine(data, horario)
+    # data_hora = datetime.combine(data, horario)
+    import pytz
+    tz = pytz.timezone('America/Sao_Paulo')
+    data_hora = tz.localize(datetime.combine(data, horario))
 
     if request.method == 'POST':
         usuario = Usuario.objects.get(id=request.session.get('usuario_id'))
