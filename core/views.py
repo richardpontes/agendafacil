@@ -191,11 +191,18 @@ def dashboard_prestador(request):
         data_hora__date=hoje,
     ).exclude(status='cancelado').order_by('data_hora')
 
+    pendentes_confirmacao_lista = Agendamento.objects.filter(
+        prestador=prestador,
+        status='pendente',
+        data_hora__date__gte=hoje,
+    ).order_by('data_hora')
+
     context = {
         'nome': request.session.get('usuario_nome'),
         'prestador': prestador,
         'agendamentos_hoje': agendamentos_hoje,
         'pendentes_confirmacao': pendentes_confirmacao,
+        'pendentes_confirmacao_lista': pendentes_confirmacao_lista,
         'clientes_semana': clientes_semana,
         'servicos_cadastrados': servicos_cadastrados,
         'agendamentos_hoje_lista': agendamentos_hoje_lista,
