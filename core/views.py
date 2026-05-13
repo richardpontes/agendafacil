@@ -694,7 +694,8 @@ def confirmar_agendamento_prestador(request, agendamento_id):
     agendamento.status = 'confirmado'
     agendamento.save()
     messages.success(request, 'Agendamento confirmado com sucesso!')
-    return redirect('agenda_prestador')
+    # return redirect('agenda_prestador')
+    return redirect('dashboard_prestador')
 
 
 def cancelar_agendamento_prestador(request, agendamento_id):
@@ -707,4 +708,5 @@ def cancelar_agendamento_prestador(request, agendamento_id):
     agendamento.status = 'cancelado'
     agendamento.save()
     messages.success(request, 'Agendamento cancelado com sucesso!')
-    return redirect('agenda_prestador')
+    # return redirect('agenda_prestador')
+    return redirect('dashboard_prestador')
